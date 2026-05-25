@@ -1,0 +1,10 @@
+{
+  "driver": "pg",
+  "user": "postgres",
+  "password": "admin123",
+  "database": "openjob_db",
+  "host": "localhost",
+  "port": 5432,
+  "migrations-table": "migrations",
+  "migrations-directory": "migrations"
+}
