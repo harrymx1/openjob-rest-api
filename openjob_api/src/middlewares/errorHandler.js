@@ -22,7 +22,7 @@ export const errorHandler = (err, req, res, next) => {
     status = 400;
     message = 'File size limit exceeded';
   }
-  else if (msg.includes('invalid file type')) {
+  else if (msg.includes('invalid file type') || msg.includes('file is required')) {
     status = 400;
   }
   else if (msg.includes('email already exists')) {
