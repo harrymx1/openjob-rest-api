@@ -5,7 +5,6 @@
   "main": "index.js",
   "scripts": {
     "start:dev": "nodemon src/index.js",
-    "start:consumer": "node src/consumer.js",
     "migrate:up": "node-pg-migrate up",
     "migrate:down": "node-pg-migrate down"
   },
@@ -22,7 +21,6 @@
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.1.1",
     "node-pg-migrate": "^8.0.4",
-    "nodemailer": "^8.0.10",
     "pg": "^8.21.0",
     "redis": "^6.0.0"
   },
