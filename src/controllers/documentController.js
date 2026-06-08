@@ -1,4 +1,9 @@
 import documentService from '../services/documentService.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const uploadDocument = async (req, res, next) => {
   try {
@@ -6,14 +11,23 @@ export const uploadDocument = async (req, res, next) => {
       return res.status(400).json({ status: 'failed', message: 'No file uploaded' });
     }
     const userId = req.user.id;
-    const { originalname, filename, mimetype, path: filePath } = req.file;
+    const { originalname, filename, mimetype, size, path: filePath } = req.file;
     const document = await documentService.create({
       userId,
       fileName: originalname,
       fileUrl: `/uploads/${filename}`,
       fileType: mimetype
     });
-    res.status(201).json({ status: 'success', data: document });
+    
+    res.status(201).json({ 
+      status: 'success', 
+      data: {
+        documentId: document.id,
+        filename: filename,
+        originalName: originalname,
+        size: size
+      }
+    });
   } catch (err) {
     next(err);
   }
@@ -32,7 +46,15 @@ export const getDocumentById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const document = await documentService.getById(id);
-    res.status(200).json({ status: 'success', data: document });
+    
+    // Kirim file fisik untuk endpoint view/download
+    const filePath = path.join(__dirname, '../../', document.file_url);
+    res.download(filePath, document.file_name, {
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="${document.file_name}"`
+      }
+    });
   } catch (err) {
     next(err);
   }
