@@ -2,6 +2,8 @@ import companyModel from '../models/companyModel.js';
 
 const companyService = {
   create: async (data, userId) => {
+    // Untuk create, memberikan nilai default string kosong ('') sangat aman 
+    // karena ini adalah entri data baru.
     const { name, location = '', description = '' } = data;
     const company = await companyModel.create({ name, location, description, createdBy: userId });
     return company;
@@ -15,8 +17,17 @@ const companyService = {
   update: async (id, data, userId) => {
     const existing = await companyModel.findById(id);
     if (!existing) throw new Error('Company not found');
-    const { name, location = '', description = '' } = data;
-    const updated = await companyModel.update(id, { name, location, description });
+    
+    // PERBAIKAN: Gunakan data baru jika dikirim, jika tidak ada (undefined), gunakan data lama
+    const updatedName = data.name !== undefined ? data.name : existing.name;
+    const updatedLocation = data.location !== undefined ? data.location : existing.location;
+    const updatedDescription = data.description !== undefined ? data.description : existing.description;
+    
+    const updated = await companyModel.update(id, { 
+      name: updatedName, 
+      location: updatedLocation, 
+      description: updatedDescription 
+    });
     return updated;
   },
   deleteCompany: async (id) => {

@@ -12,12 +12,20 @@ export const loginSchema = Joi.object({
   password: Joi.string().required()
 });
 
+// Skema untuk POST (Create)
 export const companySchema = Joi.object({
   name: Joi.string().trim().required().min(2).max(255).messages({
     'any.required': 'Name is required',
     'string.empty': 'Name cannot be empty',
     'string.min': 'Name must be at least 2 characters'
   }),
+  location: Joi.string().trim().allow('', null).required(),
+  description: Joi.string().trim().allow('', null).required()
+});
+
+// Skema khusus untuk PUT (Update) agar partial update lolos validasi Joi
+export const updateCompanySchema = Joi.object({
+  name: Joi.string().trim().min(2).max(255).optional(),
   location: Joi.string().trim().allow('', null).optional(),
   description: Joi.string().trim().allow('', null).optional()
 });
@@ -37,6 +45,21 @@ export const jobSchema = Joi.object({
   location_city: Joi.string().allow('', null).optional(),
   salary_min: Joi.number().integer().min(0).optional(),
   salary_max: Joi.number().integer().min(0).optional(),
+  is_salary_visible: Joi.boolean().optional(),
+  status: Joi.string().valid('open', 'close').optional()
+});
+
+export const updateJobSchema = Joi.object({
+  company_id: Joi.string().uuid().optional(),
+  category_id: Joi.string().uuid().optional(),
+  title: Joi.string().required().min(5),
+  description: Joi.string().allow('', null).required(),
+  job_type: Joi.string().valid('full-time', 'part-time', 'contract', 'internship').optional(),
+  experience_level: Joi.string().valid('entry', 'mid', 'senior', 'lead').optional(),
+  location_type: Joi.string().valid('remote', 'onsite', 'hybrid').optional(),
+  location_city: Joi.string().allow('', null).optional(),
+  salary_min: Joi.number().integer().min(0).optional(),
+  salary_max: Joi.number().integer().min(0).required(),
   is_salary_visible: Joi.boolean().optional(),
   status: Joi.string().valid('open', 'close').optional()
 });
