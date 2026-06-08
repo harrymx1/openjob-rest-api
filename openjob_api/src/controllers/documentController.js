@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 export const uploadDocument = async (req, res, next) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ status: 'failed', message: 'No file uploaded' });
+      return res.status(400).json({ status: 'failed', message: 'Document file is required' });
     }
     const userId = req.user.id;
     const { originalname, filename, mimetype, size, path: filePath } = req.file;
