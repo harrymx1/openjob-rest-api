@@ -14,7 +14,8 @@ export const getProfile = async (req, res, next) => {
 export const getMyApplications = async (req, res, next) => {
   try {
     const applications = await applicationService.getByUserId(req.user.id);
-    res.status(200).json({ status: 'success', data: { applications } });
+    const formattedApps = applications.map(app => ({ ...app, salary_min: null, salary_max: null }));
+    res.status(200).json({ status: 'success', data: { applications: formattedApps } });
   } catch (err) {
     next(err);
   }

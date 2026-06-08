@@ -19,6 +19,12 @@ const userService = {
     return user;
   },
 
+  updateUser: async (id, data) => {
+    const updated = await userModel.update(id, data);
+    if (!updated) throw new Error('User not found');
+    return updated;
+  },
+
   login: async (email, password) => {
     const user = await userModel.findByEmail(email);
     if (!user) throw new Error('Invalid email or password');

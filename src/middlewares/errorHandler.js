@@ -18,6 +18,13 @@ export const errorHandler = (err, req, res, next) => {
   else if (msg.includes('not found')) {
     status = 404;
   }
+  else if (err.code === 'LIMIT_FILE_SIZE' || msg.includes('file too large')) {
+    status = 400;
+    message = 'File size limit exceeded';
+  }
+  else if (msg.includes('invalid file type')) {
+    status = 400;
+  }
   else if (msg.includes('email already exists')) {
     status = 400;
   }

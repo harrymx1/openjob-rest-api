@@ -15,10 +15,9 @@ const companyModel = {
 
   findAll: async () => {
     const { rows } = await pool.query(`
-      SELECT c.*, u.name as creator_name
-      FROM companies c
-      LEFT JOIN users u ON c.created_by = u.id
-      ORDER BY c.created_at DESC
+      SELECT id, name, location, description, created_at, updated_at
+      FROM companies
+      ORDER BY created_at DESC
     `);
     return rows;
   },
@@ -26,10 +25,9 @@ const companyModel = {
   findById: async (id) => {
     if (!isValidUUID(id)) return null;
     const query = `
-      SELECT c.*, u.name as creator_name
-      FROM companies c
-      LEFT JOIN users u ON c.created_by = u.id
-      WHERE c.id = $1
+      SELECT id, name, location, description, created_at, updated_at
+      FROM companies
+      WHERE id = $1
     `;
     const { rows } = await pool.query(query, [id]);
     return rows[0];

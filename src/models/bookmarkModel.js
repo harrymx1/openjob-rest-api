@@ -14,23 +14,51 @@ const bookmarkModel = {
     return rows[0];
   },
 
-  findByUser: async (userId) => {
-    if (!isValidUUID(userId)) return [];
+  findAll: async () => {
     const query = `
-      SELECT b.*, j.title as job_title, j.company_id, c.name as company_name
+      SELECT b.id, b.user_id, b.job_id, b.created_at, b.created_at as updated_at,
+             j.company_id, j.category_id, j.title, j.description, j.job_type, j.experience_level, j.location_type, j.location_city, j.salary_min, j.salary_max, j.is_salary_visible, j.status,
+             c.name as company_name
       FROM bookmarks b
-      LEFT JOIN jobs j ON b.job_id = j.id
-      LEFT JOIN companies c ON j.company_id = c.id
-      WHERE b.user_id = $1
+      JOIN jobs j ON b.job_id = j.id
+      JOIN companies c ON j.company_id = c.id
       ORDER BY b.created_at DESC
     `;
-    const { rows } = await pool.query(query, [userId]);
+    const { rows } = await pool.query(query);
     return rows;
+  },
+
+  findByUser: async (userId) => {
+    if (!isValidUUID(userId)) return [];
+    try {
+      const query = `
+        SELECT b.id, b.user_id, b.job_id, b.created_at, b.created_at as updated_at,
+               j.company_id, j.category_id, j.title, j.description, j.job_type, j.experience_level, j.location_type, j.location_city, j.salary_min, j.salary_max, j.is_salary_visible, j.status,
+               c.name as company_name
+        FROM bookmarks b
+        JOIN jobs j ON b.job_id = j.id
+        JOIN companies c ON j.company_id = c.id
+        WHERE b.user_id = $1
+        ORDER BY b.created_at DESC
+      `;
+      const { rows } = await pool.query(query, [userId]);
+      return rows;
+    } catch (error) {
+      return [];
+    }
   },
 
   findById: async (id) => {
     if (!isValidUUID(id)) return null;
-    const query = `SELECT * FROM bookmarks WHERE id = $1`;
+    const query = `
+      SELECT b.id, b.user_id, b.job_id, b.created_at, b.created_at as updated_at,
+             j.company_id, j.category_id, j.title, j.description, j.job_type, j.experience_level, j.location_type, j.location_city, j.salary_min, j.salary_max, j.is_salary_visible, j.status,
+             c.name as company_name
+      FROM bookmarks b
+      JOIN jobs j ON b.job_id = j.id
+      JOIN companies c ON j.company_id = c.id
+      WHERE b.id = $1
+    `;
     const { rows } = await pool.query(query, [id]);
     return rows[0];
   },

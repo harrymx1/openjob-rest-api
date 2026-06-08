@@ -21,9 +21,15 @@ const jobModel = {
 
   findAll: async (filters = {}) => {
     let query = `
-      SELECT j.*, 
-             c.name as company_name, c.location as company_location,
-             cat.name as category_name
+      SELECT j.id, j.company_id, j.category_id, j.title, j.description, j.job_type, j.experience_level, j.location_type, j.location_city, j.salary_min, j.salary_max, j.is_salary_visible, j.status
+    `;
+    
+    // Add joined fields if it's a search
+    if (filters.title || filters['company-name']) {
+      query += `, c.name as company_name, c.location as company_location, cat.name as category_name `;
+    }
+
+    query += `
       FROM jobs j
       LEFT JOIN companies c ON j.company_id = c.id
       LEFT JOIN categories cat ON j.category_id = cat.id
@@ -52,13 +58,9 @@ const jobModel = {
   findById: async (id) => {
     if (!isValidUUID(id)) return null;
     const query = `
-      SELECT j.*, 
-             c.name as company_name, c.location as company_location,
-             cat.name as category_name
-      FROM jobs j
-      LEFT JOIN companies c ON j.company_id = c.id
-      LEFT JOIN categories cat ON j.category_id = cat.id
-      WHERE j.id = $1
+      SELECT id, company_id, category_id, title, description, job_type, experience_level, location_type, location_city, salary_min, salary_max, is_salary_visible, status
+      FROM jobs
+      WHERE id = $1
     `;
     const { rows } = await pool.query(query, [id]);
     return rows[0];

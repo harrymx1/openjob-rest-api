@@ -12,12 +12,19 @@ const applicationModel = {
     return rows[0];
   },
 
+  findByUserAndJob: async (userId, jobId) => {
+    if (!isValidUUID(userId) || !isValidUUID(jobId)) return null;
+    const query = `SELECT * FROM applications WHERE user_id = $1 AND job_id = $2`;
+    const { rows } = await pool.query(query, [userId, jobId]);
+    return rows[0];
+  },
+
   findAll: async () => {
     const query = `
-      SELECT a.*, u.name as user_name, j.title as job_title
+      SELECT a.id, a.user_id, a.job_id, a.status, a.applied_at, a.updated_at,
+             j.title, j.description, j.job_type, j.experience_level, j.location_type, j.location_city, j.company_id
       FROM applications a
-      LEFT JOIN users u ON a.user_id = u.id
-      LEFT JOIN jobs j ON a.job_id = j.id
+      JOIN jobs j ON a.job_id = j.id
       ORDER BY a.applied_at DESC
     `;
     const { rows } = await pool.query(query);
@@ -27,10 +34,10 @@ const applicationModel = {
   findById: async (id) => {
     if (!isValidUUID(id)) return null;
     const query = `
-      SELECT a.*, u.name as user_name, j.title as job_title
+      SELECT a.id, a.user_id, a.job_id, a.status, a.applied_at, a.updated_at,
+             j.title, j.description, j.job_type, j.experience_level, j.location_type, j.location_city, j.company_id
       FROM applications a
-      LEFT JOIN users u ON a.user_id = u.id
-      LEFT JOIN jobs j ON a.job_id = j.id
+      JOIN jobs j ON a.job_id = j.id
       WHERE a.id = $1
     `;
     const { rows } = await pool.query(query, [id]);
@@ -41,10 +48,10 @@ const applicationModel = {
     if (!isValidUUID(userId)) return [];
     try {
       const query = `
-        SELECT a.*, j.title as job_title, j.company_id, c.name as company_name
+        SELECT a.id, a.user_id, a.job_id, a.status, a.applied_at, a.updated_at,
+               j.title, j.description, j.job_type, j.experience_level, j.location_type, j.location_city, j.company_id
         FROM applications a
-        LEFT JOIN jobs j ON a.job_id = j.id
-        LEFT JOIN companies c ON j.company_id = c.id
+        JOIN jobs j ON a.job_id = j.id
         WHERE a.user_id = $1
         ORDER BY a.applied_at DESC
       `;
@@ -59,9 +66,10 @@ const applicationModel = {
     if (!isValidUUID(jobId)) return [];
     try {
       const query = `
-        SELECT a.*, u.name as user_name
+        SELECT a.id, a.user_id, a.job_id, a.status, a.applied_at, a.updated_at,
+               j.title, j.description, j.job_type, j.experience_level, j.location_type, j.location_city, j.company_id
         FROM applications a
-        LEFT JOIN users u ON a.user_id = u.id
+        JOIN jobs j ON a.job_id = j.id
         WHERE a.job_id = $1
         ORDER BY a.applied_at DESC
       `;

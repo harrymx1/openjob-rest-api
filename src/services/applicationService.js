@@ -2,6 +2,12 @@ import applicationModel from '../models/applicationModel.js';
 
 const applicationService = {
   create: async (data) => {
+    const existing = await applicationModel.findByUserAndJob(data.user_id, data.job_id);
+    if (existing) {
+      const error = new Error('Duplicate application returns 400');
+      error.code = '23505'; // Fake duplicate entry code to map to 400
+      throw error;
+    }
     return applicationModel.create({
       userId: data.user_id,
       jobId: data.job_id,
